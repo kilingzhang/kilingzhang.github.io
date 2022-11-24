@@ -1,0 +1,254 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>OpenTelemetry-组件 | kilingzhang</title>
+<link rel="shortcut icon" href="https://blog.kilingzhang.com/favicon.ico?v=1669303767893">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="https://blog.kilingzhang.com/styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="OpenTelemetry-组件 | kilingzhang - Atom Feed" href="https://blog.kilingzhang.com/atom.xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-193175920-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-193175920-1');
+</script>
+
+
+    <meta name="description" content="OpenTelemetry项目是由很多个组件构成的。这些组件作为一个单一的实现并提供简单的接入方式。以确保与供应商无关的解决方案。将来还会增加更多的组件。
+Proto
+与语言无关的接口类型。它定义了每个仪表库、收集器、公共部分和资源的数据源..." />
+    <meta name="keywords" content="可观测平台,OpenTelemetry,Trace,Log,Metric" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://blog.kilingzhang.com">
+  <img class="avatar" src="https://blog.kilingzhang.com/images/avatar.png?v=1669303767893" alt="">
+  </a>
+  <h1 class="site-title">
+    kilingzhang
+  </h1>
+  <p class="site-description">
+    一只在奋斗的小透明🎈
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="/archives" class="menu">
+          归档
+        </a>
+      
+    
+      
+        <a href="/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="/post/about" class="menu">
+          关于
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+        <a href="https://github.com/kilingzhang" target="_blank">
+          <i class="ri-github-line"></i>
+        </a>
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              OpenTelemetry-组件
+            </h2>
+            <div class="post-info">
+              <span>
+                2021-11-18
+              </span>
+              <span>
+                2 min read
+              </span>
+              
+                <a href="https://blog.kilingzhang.com/tag/XRE1Cdu84/" class="post-tag">
+                  # 可观测平台
+                </a>
+              
+                <a href="https://blog.kilingzhang.com/tag/HoJGn3sG7/" class="post-tag">
+                  # OpenTelemetry
+                </a>
+              
+                <a href="https://blog.kilingzhang.com/tag/HpFcFGqMVQ/" class="post-tag">
+                  # Trace
+                </a>
+              
+                <a href="https://blog.kilingzhang.com/tag/qIPl7iUdB9/" class="post-tag">
+                  # Log
+                </a>
+              
+                <a href="https://blog.kilingzhang.com/tag/t3EchIJ6th/" class="post-tag">
+                  # Metric
+                </a>
+              
+            </div>
+            
+              <img class="post-feature-image" src="https://tva2.sinaimg.cn/large/0064lX42ly1h8eh6f9pxhj30qo0f0t9k.jpg" alt="">
+            
+            <div class="post-content-wrapper">
+              <div class="post-content">
+                <p>OpenTelemetry项目是由很多个组件构成的。这些组件作为一个单一的实现并提供简单的接入方式。以确保与供应商无关的解决方案。将来还会增加更多的组件。</p>
+<h2 id="proto">Proto</h2>
+<p>与语言无关的接口类型。它定义了每个仪表库、收集器、公共部分和资源的数据源。Proto文件被广泛讨论。有关更多信息，请参见<a href="https://github.com/open-telemetry/opentelemetry-proto">proto repository</a>。</p>
+<h2 id="规范">规范</h2>
+<p>描述所有跨语言需求和期望的实现。除了术语的定义之外，规范还定义了以下内容：</p>
+<ul>
+<li>API：用于产生遥测数据。定义每个数据源以及其他方面，包括 baggage 和 propagators。</li>
+<li>SDK：具有处理和导出功能的API的实现。定义每个数据源以及其他方面，包括资源和配置。</li>
+<li>Data：定义语义约定，以提供与供应商无关的实现以及OpenTelemetry协议(OTLP)。</li>
+</ul>
+<p>更多信息可以看 <a href="https://opentelemetry.io/docs/reference/specification/">官方规范</a></p>
+<h2 id="收集器">收集器</h2>
+<p>OpenTelemetry收集器提供了一个与供应商无关的实现，用于接收、处理和导出遥测数据。它消除了运行、操作和维护多个代理/收集器的需要，以支持开源的可观察性数据格式(例如Jaeger、Prometheus等)。发送到一个或多个开源或商业的后端服务。Collector是导出遥测数据的默认仪器库。</p>
+<p>更多信息可以看 <a href="https://opentelemetry.io/docs/concepts/data-collection/">收集器</a></p>
+<h2 id="仪器库">仪器库</h2>
+<p>OpenTelemetry项目的灵感来自于让每个库和应用程序直接调用OpenTelemetry API，从而使它们可以立即被观察到。在此之前，需要一个单独的库来注入这些信息。为另一个库提供可观测性的库统称为仪器库。OpenTelemetry项目为多种语言提供了一个工具库。所有检测库都支持手动(代码修改)检测，还有几个支持自动(字节码)检测。</p>
+<p>更多信息可以看 <a href="https://opentelemetry.io/docs/concepts/instrumenting/">收集器</a></p>
+
+              </div>
+              <div class="toc-container">
+                <ul class="markdownIt-TOC">
+<li>
+<ul>
+<li><a href="#proto">Proto</a></li>
+<li><a href="#%E8%A7%84%E8%8C%83">规范</a></li>
+<li><a href="#%E6%94%B6%E9%9B%86%E5%99%A8">收集器</a></li>
+<li><a href="#%E4%BB%AA%E5%99%A8%E5%BA%93">仪器库</a></li>
+</ul>
+</li>
+</ul>
+
+              </div>
+            </div>
+          </article>
+        </div>
+
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://blog.kilingzhang.com/post/tong-yi-ke-guan-ce-ping-tai-opentelemetry/">
+              <h3 class="post-title">
+                OpenTelemetry-什么是OpenTelemetry
+              </h3>
+            </a>
+          </div>
+        
+
+        
+          
+            <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+<script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+
+<div id="gitalk-container"></div>
+
+<script>
+
+  var gitalk = new Gitalk({
+    clientID: '80dc14b8b39a9a9b7148',
+    clientSecret: 'e50fadaa8a0908b977c1763e1ceb3b0b77727207',
+    repo: 'Gittalk',
+    owner: 'kilingzhang',
+    admin: ['kilingzhang'],
+    id: (location.pathname).substring(0, 49),      // Ensure uniqueness and length less than 50
+    distractionFreeMode: false  // Facebook-like distraction free mode
+  })
+
+  gitalk.render('gitalk-container')
+
+</script>
+
+          
+
+          
+        
+
+        <div class="site-footer">
+  <a href="https://github.com/kilingzhang" target="_blank">kilingzhang</a>
+  <a class="rss" href="https://blog.kilingzhang.com/atom.xml" target="_blank">
+    <i class="ri-rss-line"></i> RSS
+  </a>
+</div>
+
+      </div>
+    </div>
+
+    <script>
+      hljs.initHighlightingOnLoad()
+
+      let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+      // This should probably be throttled.
+      // Especially because it triggers during smooth scrolling.
+      // https://lodash.com/docs/4.17.10#throttle
+      // You could do like...
+      // window.addEventListener("scroll", () => {
+      //    _.throttle(doThatStuff, 100);
+      // });
+      // Only not doing it here to keep this Pen dependency-free.
+
+      window.addEventListener("scroll", event => {
+        let fromTop = window.scrollY;
+
+        mainNavLinks.forEach((link, index) => {
+          let section = document.getElementById(decodeURI(link.hash).substring(1));
+          let nextSection = null
+          if (mainNavLinks[index + 1]) {
+            nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+          }
+          if (section.offsetTop <= fromTop) {
+            if (nextSection) {
+              if (nextSection.offsetTop > fromTop) {
+                link.classList.add("current");
+              } else {
+                link.classList.remove("current");    
+              }
+            } else {
+              link.classList.add("current");
+            }
+          } else {
+            link.classList.remove("current");
+          }
+        });
+      });
+
+    </script>
+  </body>
+</html>

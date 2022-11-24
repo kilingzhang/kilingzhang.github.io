@@ -1,0 +1,366 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>OpenTelemetry-数据源 | kilingzhang</title>
+<link rel="shortcut icon" href="https://blog.kilingzhang.com/favicon.ico?v=1669303767893">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="https://blog.kilingzhang.com/styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="OpenTelemetry-数据源 | kilingzhang - Atom Feed" href="https://blog.kilingzhang.com/atom.xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-193175920-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-193175920-1');
+</script>
+
+
+    <meta name="description" content="OpenTelemetry 支持如下所定义的多个数据源。未来可能会添加更多的数据源。
+Traces
+追踪单个请求的进程，称为Trace，由组成应用程序的服务处理。该请求可以由用户或应用程序发起。分布式追踪是一种贯穿进程、网络和安全边界的一种..." />
+    <meta name="keywords" content="可观测平台,OpenTelemetry,Trace,Log,Metric" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://blog.kilingzhang.com">
+  <img class="avatar" src="https://blog.kilingzhang.com/images/avatar.png?v=1669303767893" alt="">
+  </a>
+  <h1 class="site-title">
+    kilingzhang
+  </h1>
+  <p class="site-description">
+    一只在奋斗的小透明🎈
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="/archives" class="menu">
+          归档
+        </a>
+      
+    
+      
+        <a href="/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="/post/about" class="menu">
+          关于
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+        <a href="https://github.com/kilingzhang" target="_blank">
+          <i class="ri-github-line"></i>
+        </a>
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              OpenTelemetry-数据源
+            </h2>
+            <div class="post-info">
+              <span>
+                2021-11-24
+              </span>
+              <span>
+                14 min read
+              </span>
+              
+                <a href="https://blog.kilingzhang.com/tag/XRE1Cdu84/" class="post-tag">
+                  # 可观测平台
+                </a>
+              
+                <a href="https://blog.kilingzhang.com/tag/HoJGn3sG7/" class="post-tag">
+                  # OpenTelemetry
+                </a>
+              
+                <a href="https://blog.kilingzhang.com/tag/HpFcFGqMVQ/" class="post-tag">
+                  # Trace
+                </a>
+              
+                <a href="https://blog.kilingzhang.com/tag/qIPl7iUdB9/" class="post-tag">
+                  # Log
+                </a>
+              
+                <a href="https://blog.kilingzhang.com/tag/t3EchIJ6th/" class="post-tag">
+                  # Metric
+                </a>
+              
+            </div>
+            
+              <img class="post-feature-image" src="https://tva2.sinaimg.cn/large/0064lX42ly1h8eh6f9pxhj30qo0f0t9k.jpg" alt="">
+            
+            <div class="post-content-wrapper">
+              <div class="post-content">
+                <p>OpenTelemetry 支持如下所定义的多个数据源。未来可能会添加更多的数据源。</p>
+<h2 id="traces">Traces</h2>
+<p>追踪单个请求的进程，称为Trace，由组成应用程序的服务处理。该请求可以由用户或应用程序发起。分布式追踪是一种贯穿进程、网络和安全边界的一种追踪形式。Trace中的每个最小工作单元称为一个Span。每个Trace都是是一棵由Span组成的树结构。Span是由请求中通过系统的所涉及的各个服务或组件的工作对象。每个Span都包含一个一组全局惟一标识符，以表示每个Span所属的唯一请求的Span上下文。同时Span提供了请求、错误和持续时间(RED)等指标，以便调试可用性和性能问题。</p>
+<blockquote>
+<p>Traces track the progression of a single request, called a trace, as it is handled by services that make up an application. The request may be initiated by a user or an application. Distributed tracing is a form of tracing that traverses process, network and security boundaries. Each unit of work in a trace is called a span; a trace is a tree of spans. Spans are objects that represent the work being done by individual services or components involved in a request as it flows through a system. A span contains a span context, which is a set of globally unique identifiers that represent the unique request that each span is a part of. A span provides Request, Error and Duration (RED) metrics that can be used to debug availability as well as performance issues.</p>
+</blockquote>
+<p>Trace包含一个封装了整个请求的端到端耗时的根Span。你可以把它看作是一个单一的逻辑操作，例如在一个网络应用程序中点击一个按钮，把一个产品添加到一个购物车中。根Span将测量从终端用户点击该按钮到操作完成或失败（项目被添加到购物车或发生一些错误）并向用户显示结果所需的时间。一个追踪是由单一的根Span和任何数量的子Span组成的，子Span表示作为请求的一部分所发生的操作。每个Span都包含关于操作的元数据，如：名称、开始和结束的时间戳、属性、事件和状态。</p>
+<blockquote>
+<p>A trace contains a single root span which encapsulates the end-to-end latency for the entire request. You can think of this as a single logical operation, such as clicking a button in a web application to add a product to a shopping cart. The root span would measure the time it took from an end-user clicking that button to the operation being completed or failing (so, the item is added to the cart or some error occurs) and the result being displayed to the user. A trace is comprised of the single root span and any number of child spans, which represent operations taking place as part of the request. Each span contains metadata about the operation, such as its name, start and end timestamps, attributes, events, and status.</p>
+</blockquote>
+<p>为了在OpenTelemetry中创建和管理Span，OpenTelemetry API提供了Trace接口。该对象负责追踪进程中的运行的Span，并允许你访问当前Span，以便对其进行操作，如添加属性、事件，以及在其追踪的工作完成后结束它。一个进程中可以通过「 Tracer Provider」 创建一个或多个Trace对象，这个工厂接口允许在一个进程中用不同的选项实例化多个Trace。</p>
+<blockquote>
+<p>To create and manage spans in OpenTelemetry, the OpenTelemetry API provides the tracer interface. This object is responsible for tracking the active span in your process, and allows you to access the current span in order to perform operations on it such as adding attributes, events, and finishing it when the work it tracks is complete. One or more tracer objects can be created in a process through the tracer provider, a factory interface that allows for multiple tracers to be instantiated in a single process with different options.</p>
+</blockquote>
+<p>一般来说，一个Span的生命周期类似如下:</p>
+<ul>
+<li>一个服务收到了一个请求。如果存在Span上下文，则从请求头中提取上下文。</li>
+<li>一个新的Span被创建为从Header提取的Span上下文的子级；如果不存在，则创建一个新的根Span。</li>
+<li>每个服务处理的请求。额外的属性和事件将被添加到Span中，这些属性和事件对于理解请求的上下文是有用的，例如处理请求的机器的主机名，或者客户标识符等。</li>
+<li>可以创建新的跨度来代表服务的子组件所正在进行的工作。</li>
+<li>当服务对另一个服务进行远程调用时，当前的跨度上下文将被序列化，并通过将跨度的上下文注入请求头或消息包的方式转发给下一个服务。</li>
+<li>服务所做的工作完成了，无论成功与否。跨度状态应该被适当地设置，并且将跨度标记为完成。</li>
+</ul>
+<p>有关详细信息，请参见<a href="https://opentelemetry.io/docs/reference/specification/overview/#tracing-signal">追踪规范</a></p>
+<blockquote>
+<ul>
+<li>A request is received by a service. The span context is extracted from the request headers, if it exists.</li>
+<li>A new span is created as a child of the extracted span context; if none exists, a new root span is created.</li>
+<li>The service handles the request. Additional attributes and events are added to the span that are useful for understanding the context of the request, such as the hostname of the machine handling the request, or customer identifiers.</li>
+<li>New spans may be created to represent work being done by sub-components of the service.</li>
+<li>When the service makes a remote call to another service, the current span context is serialized and forwarded to the next service by injecting the span context into the headers or message envelope.</li>
+<li>The work being done by the service completes, successfully or not. The span status is appropriately set, and the span is marked finished.</li>
+</ul>
+</blockquote>
+<h2 id="metrics">Metrics</h2>
+<p>Metrics 是关于服务在运行时捕获的测量结果。从逻辑上讲，捕获其中一个度量的时刻被称为度量事件，它不仅包括度量本身，还包括捕获它的时间和相关的元数据。</p>
+<p>应用程序和请求度量是可用性和性能的重要指标。自定义指标可以深入了解可用性指标如何影响用户体验或业务。收集到的数据可用于警告停机或触发调度决策，以便在需求高时自动扩展部署。</p>
+<p>如今，OpenTelemetry 定义了三种度量工具:</p>
+<ul>
+<li>计数器「Counter」: 一个随时间累加的值。你可以把它想象成汽车上的里程表，它只会增加。</li>
+<li>度量「Measure」: 随着时间的推移而聚合的值。这更类似于汽车上的行程里程表，它表示某个定义范围内的值。</li>
+<li>观测器「Observer」: 捕捉当前某个特定时间点的一组数值，如汽车中的燃油表。</li>
+</ul>
+<p>除了这三种公制工具之外，聚合「aggregations」的概念也是需要理解的一个重要概念。聚合是一种技术，通过这种技术，可以将大量度量组合成关于在一个时间窗口内发生的度量事件的确切或估计统计信息。OpenTelemetry api 本身不允许您指定这些聚合，但是却提供了一些默认值。通常，OpenTelemetry sdk 提供了可视化工具和遥测后端支持的常见聚合(如 sum、 count、 last value 和 histogram)。</p>
+<p>请求跟踪的目的是捕获请求的生命周期并为请求的各个部分提供上下文，而度量的目的是提供总体的统计信息。标准度量的一些用例包括:</p>
+<ul>
+<li>报告每个协议类型的服务读取的字节总数</li>
+<li>报告每个请求的读取总字节数和字节数</li>
+<li>报告系统调用的持续时间</li>
+<li>报告请求大小以确定趋势</li>
+<li>报告进程的CPU或内存使用情况</li>
+<li>报告帐户的平均余额</li>
+<li>报告当前活动正在处理的请求</li>
+</ul>
+<p>有关详细信息，请参<a href="https://opentelemetry.io/docs/reference/specification/overview/#metric-signal">阅度量规范</a></p>
+<blockquote>
+<p>A metric is a measurement about a service, captured at runtime. Logically, the moment of capturing one of these measurements is known as a metric event which consists not only of the measurement itself, but the time that it was captured and associated metadata.</p>
+</blockquote>
+<blockquote>
+<p>Application and request metrics are important indicators of availability and performance. Custom metrics can provide insights into how availability indicators impact user experience or the business. Collected data can be used to alert of an outage or trigger scheduling decisions to scale up a deployment automatically upon high demand.</p>
+</blockquote>
+<blockquote>
+<p>OpenTelemetry defines three metric instruments today:</p>
+</blockquote>
+<blockquote>
+<ul>
+<li>counter: a value that is summed over time – you can think of this like an odometer on a car; it only ever goes up.</li>
+<li>measure: a value that is aggregated over time. This is more akin to the trip odometer on a car, it represents a value over some defined range.</li>
+<li>observer: captures a current set of values at a particular point in time, like a fuel gauge in a vehicle.</li>
+</ul>
+</blockquote>
+<blockquote>
+<p>In addition to the three metric instruments, the concept of aggregations is an important one to understand. An aggregation is a technique whereby a large number of measurements are combined into either exact or estimated statistics about metric events that took place during a time window. The OpenTelemetry API itself does not allow you to specify these aggregations, but provides some default ones. In general, the OpenTelemetry SDK provides for common aggregations (such as sum, count, last value, and histograms) that are supported by visualizers and telemetry backends.</p>
+</blockquote>
+<blockquote>
+<p>Unlike request tracing, which is intended to capture request lifecycles and provide context to the individual pieces of a request, metrics are intended to provide statistical information in aggregate. Some examples of use cases for metrics include:</p>
+</blockquote>
+<blockquote>
+<ul>
+<li>Reporting the total number of bytes read by a service, per protocol type.</li>
+<li>Reporting the total number of bytes read and the bytes per request.</li>
+<li>Reporting the duration of a system call.</li>
+<li>Reporting request sizes in order to determine a trend.</li>
+<li>Reporting CPU or memory usage of a process.</li>
+<li>Reporting average balance values from an account.</li>
+<li>Reporting current active requests being handled.</li>
+</ul>
+</blockquote>
+<blockquote>
+<p>For more information, see the metrics specification, which covers topics including: measure, measurement, metric, data, data point and labels.</p>
+</blockquote>
+<h2 id="logs">Logs</h2>
+<p>日志是有元数据的带时间戳的文本记录，可以是结构化(建议)的，也可以是非结构化的。虽然日志是一个独立的数据源，但它们也可以附加到 Span。在 OpenTelemetry 中，任何不属于分布式追踪和度量的数据都是日志。例如，事件就是一种特定类型的日志。日志通常用于确定问题的根本原因，通常包含关于谁更改了什么以及更改的结果的信息。</p>
+<p>有关详细信息，请参阅<a href="https://opentelemetry.io/docs/reference/specification/overview/#log-signal">日志规范</a></p>
+<blockquote>
+<p>A log is a timestamped text record, either structured (recommended) or unstructured, with metadata. While logs are an independent data source, they may also be attached to spans. In OpenTelemetry, any data that is not part of a distributed trace or a metric is a log. For example, events are a specific type of log. Logs are often used to determine the root cause of an issue and typically contain information about who changed what as well as the result of the change.</p>
+</blockquote>
+<blockquote>
+<p>For more information, see the logs specification, which covers topics including: log, defined fields, trace context fields and severity fields.</p>
+</blockquote>
+<h2 id="baggage">Baggage</h2>
+<p>除了追踪传播之外，OpenTelemetry 还提供了一种简单的名 k/v对的传播机制，称为行李「 baggage」。 「baggage」旨在在一个服务中索引可观察性事件，该服务在同一事务中的先前服务提供的属性。这有助于在这些事件之间建立因果关系。</p>
+<p>虽然「baggage」可以用来构其他纬度关注点的原型，但这种机制主要用于传递 OpenTelemetry 可观测性系统的值。</p>
+<p>这些值可以从「baggage」中使用，并用作度量的额外维度，或用作日志和追踪的额外上下文。以下是一些例子:</p>
+<ul>
+<li>Web服务可以通过包含发送请求的服务的上下文</li>
+<li>SaaS提供商可以包括关于负责该请求的API用户或令牌的上下文</li>
+<li>确定一个特定的浏览器版本与图像处理服务中的故障有关</li>
+</ul>
+<p>有关详细信息，请参阅<a href="https://opentelemetry.io/docs/reference/specification/overview/#baggage-signal">行李规范</a></p>
+<blockquote>
+<p>In addition to trace propagation, OpenTelemetry provides a simple mechanism for propagating name/value pairs, called baggage. Baggage is intended for indexing observability events in one service with attributes provided by a prior service in the same transaction. This helps to establish a causal relationship between these events.</p>
+</blockquote>
+<blockquote>
+<p>While baggage can be used to prototype other cross-cutting concerns, this mechanism is primarily intended to convey values for the OpenTelemetry observability systems.</p>
+</blockquote>
+<blockquote>
+<p>These values can be consumed from baggage and used as additional dimensions for metrics, or additional context for logs and traces. Some examples:</p>
+</blockquote>
+<blockquote>
+<ul>
+<li>A web service can benefit from including context around what service has sent the request</li>
+<li>A SaaS provider can include context about the API user or token that is responsible for that request</li>
+<li>Determining that a particular browser version is associated with a failure in an image processing service</li>
+</ul>
+</blockquote>
+<blockquote>
+<p>For more information, see the baggage specification.</p>
+</blockquote>
+
+              </div>
+              <div class="toc-container">
+                <ul class="markdownIt-TOC">
+<li>
+<ul>
+<li><a href="#traces">Traces</a></li>
+<li><a href="#metrics">Metrics</a></li>
+<li><a href="#logs">Logs</a></li>
+<li><a href="#baggage">Baggage</a></li>
+</ul>
+</li>
+</ul>
+
+              </div>
+            </div>
+          </article>
+        </div>
+
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://blog.kilingzhang.com/post/opentelemetry-zu-jian/">
+              <h3 class="post-title">
+                OpenTelemetry-组件
+              </h3>
+            </a>
+          </div>
+        
+
+        
+          
+            <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+<script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+
+<div id="gitalk-container"></div>
+
+<script>
+
+  var gitalk = new Gitalk({
+    clientID: '80dc14b8b39a9a9b7148',
+    clientSecret: 'e50fadaa8a0908b977c1763e1ceb3b0b77727207',
+    repo: 'Gittalk',
+    owner: 'kilingzhang',
+    admin: ['kilingzhang'],
+    id: (location.pathname).substring(0, 49),      // Ensure uniqueness and length less than 50
+    distractionFreeMode: false  // Facebook-like distraction free mode
+  })
+
+  gitalk.render('gitalk-container')
+
+</script>
+
+          
+
+          
+        
+
+        <div class="site-footer">
+  <a href="https://github.com/kilingzhang" target="_blank">kilingzhang</a>
+  <a class="rss" href="https://blog.kilingzhang.com/atom.xml" target="_blank">
+    <i class="ri-rss-line"></i> RSS
+  </a>
+</div>
+
+      </div>
+    </div>
+
+    <script>
+      hljs.initHighlightingOnLoad()
+
+      let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+      // This should probably be throttled.
+      // Especially because it triggers during smooth scrolling.
+      // https://lodash.com/docs/4.17.10#throttle
+      // You could do like...
+      // window.addEventListener("scroll", () => {
+      //    _.throttle(doThatStuff, 100);
+      // });
+      // Only not doing it here to keep this Pen dependency-free.
+
+      window.addEventListener("scroll", event => {
+        let fromTop = window.scrollY;
+
+        mainNavLinks.forEach((link, index) => {
+          let section = document.getElementById(decodeURI(link.hash).substring(1));
+          let nextSection = null
+          if (mainNavLinks[index + 1]) {
+            nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+          }
+          if (section.offsetTop <= fromTop) {
+            if (nextSection) {
+              if (nextSection.offsetTop > fromTop) {
+                link.classList.add("current");
+              } else {
+                link.classList.remove("current");    
+              }
+            } else {
+              link.classList.add("current");
+            }
+          } else {
+            link.classList.remove("current");
+          }
+        });
+      });
+
+    </script>
+  </body>
+</html>

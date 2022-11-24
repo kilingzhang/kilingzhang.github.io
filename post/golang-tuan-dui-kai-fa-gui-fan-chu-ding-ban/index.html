@@ -1,0 +1,394 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Go团队开发规范 初定版 | kilingzhang</title>
+<link rel="shortcut icon" href="https://blog.kilingzhang.com/favicon.ico?v=1669303767893">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="https://blog.kilingzhang.com/styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="Go团队开发规范 初定版 | kilingzhang - Atom Feed" href="https://blog.kilingzhang.com/atom.xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-193175920-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-193175920-1');
+</script>
+
+
+    <meta name="description" content="通用编码规范
+首先请阅读并遵守通用代码风格，大部分的风格约束是语言无关的，下面仅约束 Golang 语言相关编码规范。
+开始之前也可以先阅读官方的 Go Code Review Comments。
+在上面两个规范的基础之外，你还需要遵守：
+..." />
+    <meta name="keywords" content="" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://blog.kilingzhang.com">
+  <img class="avatar" src="https://blog.kilingzhang.com/images/avatar.png?v=1669303767893" alt="">
+  </a>
+  <h1 class="site-title">
+    kilingzhang
+  </h1>
+  <p class="site-description">
+    一只在奋斗的小透明🎈
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="/archives" class="menu">
+          归档
+        </a>
+      
+    
+      
+        <a href="/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="/post/about" class="menu">
+          关于
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+        <a href="https://github.com/kilingzhang" target="_blank">
+          <i class="ri-github-line"></i>
+        </a>
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              Go团队开发规范 初定版
+            </h2>
+            <div class="post-info">
+              <span>
+                2022-03-07
+              </span>
+              <span>
+                8 min read
+              </span>
+              
+            </div>
+            
+            <div class="post-content-wrapper">
+              <div class="post-content">
+                <h2 id="通用编码规范">通用编码规范</h2>
+<p>首先请阅读并遵守<a href="https://github.com/xxjwxc/uber_go_guide_cn">通用代码风格</a>，大部分的风格约束是语言无关的，下面仅约束 Golang 语言相关编码规范。</p>
+<p>开始之前也可以先阅读官方的 <a href="https://github.com/golang/go/wiki/CodeReviewComments">Go Code Review Comments</a>。</p>
+<p>在上面两个规范的基础之外，你还需要遵守：</p>
+<p>工欲善其事，必先利其器。在开始之前，请先参考[代码风格检查和静态代码检查工具])配置好工具，很多风格问题，都可以通过文件保存时的 hook 自动解决。</p>
+<h3 id="适当地在声明函数时为返回值命名以增加可读性">适当地在声明函数时为返回值命名，以增加可读性</h3>
+<pre><code>func Location() (float64, float64)  // bad
+func Location() (lat, long float64) // good
+</code></pre>
+<h3 id="在-golang-中使用-tab-缩进禁止使用空格缩进">在 Golang 中使用 tab 缩进，禁止使用空格缩进</h3>
+<blockquote></blockquote>
+<h3 id="所有为函数-struct-全局变量和常量等的注释都应该以被注释内容的名字开头-golint">所有为函数、struct、全局变量和常量等的注释，都应该以被注释内容的名字开头（ golint ）</h3>
+<blockquote></blockquote>
+<h3 id="不要裸启动-goroutine">不要裸启动 goroutine</h3>
+<blockquote></blockquote>
+<h3 id="获取资源连接的时候一定要处理资源关闭">获取资源连接的时候，一定要处理资源关闭</h3>
+<p><em>注意：不要在 for 循环中获取并 defer close 资源</em></p>
+<h3 id="定义内部的异常类型而不要直接通过-errorsnewfmterrorf-抛出异常">定义内部的异常类型，而不要直接通过 errors.New/fmt.Errorf 抛出异常</h3>
+<p>这样方便在聚合错误，以及「错误分析」可以查看到具体错误类型，从而方便定位问题。</p>
+<p>在对外输出的时候，再转换为对应格式（TZoneError/HTTPError）</p>
+<h3 id="对指针类型要做空指针判断避免直接使用产生-npe">对指针类型要做空指针判断，避免直接使用产生 NPE</h3>
+<p>不要做指针一定有值的假设。</p>
+<h2 id="code-review-规范">Code Review 规范</h2>
+<h3 id="目的">目的</h3>
+<ol>
+<li>提高代码的质量，让代码具有更好的可读性、可维护性</li>
+<li>提升成员之间的良好沟通，知识共享，鼓励大家互相帮助学习</li>
+<li>在项目的早期发现代码或设计中的一些问题</li>
+</ol>
+<h3 id="检查内容">检查内容</h3>
+<h4 id="代码风格检查">代码风格检查</h4>
+<ul>
+<li>是否符合代码规范，是否有良好的可读性。</li>
+<li>不要有 import * (Why is &quot;import *&quot; bad？)</li>
+</ul>
+<h3 id="测试代码">测试代码</h3>
+<ul>
+<li>新增代码是否有对应的单元测试，是否通过了所有代码测试。</li>
+</ul>
+<h3 id="健壮性检查">健壮性检查</h3>
+<ul>
+<li>程序的设计是否健壮，是否存在潜在的安全性/性能隐患。</li>
+<li>程序是否可以回退，没有回退功能的设计是失败的设计，确保所有的版本都能回退。</li>
+<li>涉及数据库的更改，一定要给相关 leader 进行 review。数据库的修改只能是增量的，在废除了字段依赖关系的下一个版本发布前，只能添加对应的表或字段，不能删除。一旦实施标准，应该有代码清除上一个版本遗留的不再需要的数据。</li>
+</ul>
+<h3 id="文档检查">文档检查</h3>
+<ul>
+<li>是否有相应的需求/设计文档，文档是描述的是否清晰能让他人明白，代码的实现是否与文档一致。</li>
+</ul>
+<h3 id="注释检查">注释检查</h3>
+<ul>
+<li>重要的代码是否有注释，注释描述的是否准确，注释的代码是否存在不必要的复杂逻辑。</li>
+<li>hack 和 <a href="https://stackoverflow.com/questions/47882/what-is-a-magic-number-and-why-is-it-bad">magic number</a> 的原因是否说明</li>
+</ul>
+<h3 id="commits">Commits</h3>
+<ul>
+<li>Commits message 是否有意义</li>
+</ul>
+<h3 id="注意事项">注意事项</h3>
+<ul>
+<li>Code review 不承担发现代码错误的职责。Code review 主要是审核代码的质量，如可读性，可维护性，以及程序的逻辑和对需求和设计的实现。</li>
+<li><a href="http://www.infoq.com/cn/news/2015/02/pull-reques-ten-suggestion">关于Pull Request的十个建议</a></li>
+<li><a href="http://kevinlondon.com/2015/05/05/code-review-best-practices.html">Code Review Best Practices</a></li>
+</ul>
+<h3 id="通用golang-安全规范"><a href="https://github.com/Tencent/secguide/blob/main/Go%E5%AE%89%E5%85%A8%E6%8C%87%E5%8D%97.md">通用Golang 安全规范</a></h3>
+<h3 id="其他">其他</h3>
+<ol>
+<li>输入验证
+<ol>
+<li>在可信系统上进行输入验证，比如：后端服务器。</li>
+<li>所有来自用户可控的输入均需验证，如：URL、参数、HTTP 头信息、cookie 等。</li>
+<li>处理用户输入的数据类型及格式时，采取 Golang 原生库提供的相应方法。
+<ol>
+<li>用 strconv 包处理字符串到其它类型的转换。<code>Atoi ParseBool ParseFloat ParseInt</code></li>
+<li>用 strings 包处理字符串及字符串属性。<code>Trim ToLower ToTitle</code></li>
+<li>用 regexp 包处理正则。</li>
+<li>用 utf8 包处理 utf8 相关编码处理。<code>Valid ValidRune ValidString EncodeRune DecodeLastRune DecodeLastRuneInString DecodeRune DecodeRuneInString</code></li>
+</ol>
+</li>
+<li>校验数据有效性
+<ol>
+<li>输入口尽可能采取白名单输入</li>
+<li>边界校验，判断输入长度</li>
+<li>检查空字节 （%00）</li>
+<li>检查换行 （%0d，%0a，\r\n）</li>
+<li>检查路径符（../ 或 \..）</li>
+<li>检查扩展的 UTF-8 特殊字符</li>
+</ol>
+</li>
+<li>为防御用户输入可能带来的 SQL 注入，请采用预声明变量的方法。</li>
+<li>XML 外部实体注入。当允许引用外部实体时，通过构造恶意内容，可导致读取任意文件、执行系统命令、探测内网端口等。go 语言原生 encoding/xml 不会解析 XML entities，如果要使用第三方处理 xml 库，请注意是否有规避实体解析的安全用法。</li>
+<li>SSRF (服务端请求伪造) SSRF 为一种常见的 Web 漏洞，由于服务器提供了从其它服务应用获取数据的功能且没有对目标地址做限制。导致攻击者通过服务器作为代理，进一步攻击内网。防御方法为指定可访问的白名单列表，或正确识别出访问地址是否为内网地址</li>
+<li>命令执行检</li>
+</ol>
+</li>
+<li>输出编码</li>
+<li>身份验证与密码管理
+<ol>
+<li>验证过程必须在可信的系统上进行，比如：后端服务器。</li>
+<li>除了那些特定的的设定为公开的内容外，对所有网页和资源要求身份验证。</li>
+<li>身份验证的失败提示信息应当避免过于明确。比如:可以使用“用户名和/或密码错误”，而不 要使用“用户名错误”或者“密码错误”。错误提示信息在显示和源代码中应保持一致。</li>
+<li>保存的密码应采用单向不可逆的方式，并有随机 salt。如 bcrypt 方法。</li>
+<li>只能使用 HTTP POST 请求传递身份验证的凭据信息。</li>
+</ol>
+</li>
+<li>会话管理
+<ol>
+<li>会话标识符必须总是在一个可信系统(比如:后端服务器)上创建。</li>
+<li>不能以 GET 参数传递会话标识符。</li>
+<li>会话管理应当保证足够的随机会话标识符，并给 cookie设置 <code>Domain</code>、<code>Path</code>、<code>Expires</code>、<code>HTTPOnly</code>、<code>Secure </code>等参数。通常情况下，我们把 Expires 值设置为 30 分钟以此来降低应用程序风险。</li>
+<li>防止产生 CSRF 漏洞（跨站请求伪造）</li>
+</ol>
+</li>
+<li>访问控制
+<ol>
+<li>使用可信系统做访问授权控制，比如：后端服务器。</li>
+<li>限制只有授权用户才能访问文件、资源、受保护的 URL、受保护的功能、服务及数据。</li>
+<li>对于越权的控制上，前端应禁止直接对象引用，使用访问资源的数据库字段。如：前端直接使用 member_id 来进行用户可访问资源的标示，篡改遍历此字段可访问到非授权的资源。</li>
+</ol>
+</li>
+<li>文件管理
+<ol>
+<li>上传应该仅限于经过身份验证的用户。</li>
+<li>确保只有白名单中的文件类型才能上传到服务器。这里给出检测 MIME 类型的参考代码：</li>
+<li>不要将文件保存在与应用程序相同的 Web 环境中。文件应当保存在内容服务器或数据库中。</li>
+<li>防止或限制上传可能被 Web 服务器解析的文件。</li>
+<li>不要传递目录或文件路径，使用预先设置路径列表中的匹配索引值。</li>
+<li>不要将绝对路径暴露给用户。</li>
+<li>不要将用户提交的数据传递到动态重定向中。如果必须允许使用，那么重定向应当只接受通 过验证的相对路径 URL。 以避免可能带来的文件遍历。攻击示例如：<br>
+http://www.example.com/read?path=../../../../etc/passwd</li>
+</ol>
+</li>
+<li>内存管理</li>
+<li>
+<ol>
+<li>缓冲区边界检查，避免超过分配的空间。一个简单的边界检查例子：</li>
+<li>确保资源已经被释放，在 go 语言中可以使用 Defer 来进行。</li>
+<li>nil 指针判断</li>
+<li>避免使用已知的易受攻击的函数。在 go 语言中，Unsafe 包和 Testing 包不应被用于生产环境。</li>
+<li>make 分配长度验证</li>
+<li>禁止重复释放 channel</li>
+<li>建议不使用 slice 作为函数入参</li>
+</ol>
+</li>
+<li>其它
+<ol>
+<li>线上代码中不能出现密码、测试帐号等硬编码方式，防止为外部留下后门。</li>
+<li>与第三方的接口调用，如 IAP 等严格准照官方的安全准则和接入规范，避免出现越权访问等情况。</li>
+<li>避免引用存在安全风险的第三方组件。</li>
+</ol>
+</li>
+</ol>
+
+              </div>
+              <div class="toc-container">
+                <ul class="markdownIt-TOC">
+<li>
+<ul>
+<li><a href="#%E9%80%9A%E7%94%A8%E7%BC%96%E7%A0%81%E8%A7%84%E8%8C%83">通用编码规范</a>
+<ul>
+<li><a href="#%E9%80%82%E5%BD%93%E5%9C%B0%E5%9C%A8%E5%A3%B0%E6%98%8E%E5%87%BD%E6%95%B0%E6%97%B6%E4%B8%BA%E8%BF%94%E5%9B%9E%E5%80%BC%E5%91%BD%E5%90%8D%E4%BB%A5%E5%A2%9E%E5%8A%A0%E5%8F%AF%E8%AF%BB%E6%80%A7">适当地在声明函数时为返回值命名，以增加可读性</a></li>
+<li><a href="#%E5%9C%A8-golang-%E4%B8%AD%E4%BD%BF%E7%94%A8-tab-%E7%BC%A9%E8%BF%9B%E7%A6%81%E6%AD%A2%E4%BD%BF%E7%94%A8%E7%A9%BA%E6%A0%BC%E7%BC%A9%E8%BF%9B">在 Golang 中使用 tab 缩进，禁止使用空格缩进</a></li>
+<li><a href="#%E6%89%80%E6%9C%89%E4%B8%BA%E5%87%BD%E6%95%B0-struct-%E5%85%A8%E5%B1%80%E5%8F%98%E9%87%8F%E5%92%8C%E5%B8%B8%E9%87%8F%E7%AD%89%E7%9A%84%E6%B3%A8%E9%87%8A%E9%83%BD%E5%BA%94%E8%AF%A5%E4%BB%A5%E8%A2%AB%E6%B3%A8%E9%87%8A%E5%86%85%E5%AE%B9%E7%9A%84%E5%90%8D%E5%AD%97%E5%BC%80%E5%A4%B4-golint">所有为函数、struct、全局变量和常量等的注释，都应该以被注释内容的名字开头（ golint ）</a></li>
+<li><a href="#%E4%B8%8D%E8%A6%81%E8%A3%B8%E5%90%AF%E5%8A%A8-goroutine">不要裸启动 goroutine</a></li>
+<li><a href="#%E8%8E%B7%E5%8F%96%E8%B5%84%E6%BA%90%E8%BF%9E%E6%8E%A5%E7%9A%84%E6%97%B6%E5%80%99%E4%B8%80%E5%AE%9A%E8%A6%81%E5%A4%84%E7%90%86%E8%B5%84%E6%BA%90%E5%85%B3%E9%97%AD">获取资源连接的时候，一定要处理资源关闭</a></li>
+<li><a href="#%E5%AE%9A%E4%B9%89%E5%86%85%E9%83%A8%E7%9A%84%E5%BC%82%E5%B8%B8%E7%B1%BB%E5%9E%8B%E8%80%8C%E4%B8%8D%E8%A6%81%E7%9B%B4%E6%8E%A5%E9%80%9A%E8%BF%87-errorsnewfmterrorf-%E6%8A%9B%E5%87%BA%E5%BC%82%E5%B8%B8">定义内部的异常类型，而不要直接通过 errors.New/fmt.Errorf 抛出异常</a></li>
+<li><a href="#%E5%AF%B9%E6%8C%87%E9%92%88%E7%B1%BB%E5%9E%8B%E8%A6%81%E5%81%9A%E7%A9%BA%E6%8C%87%E9%92%88%E5%88%A4%E6%96%AD%E9%81%BF%E5%85%8D%E7%9B%B4%E6%8E%A5%E4%BD%BF%E7%94%A8%E4%BA%A7%E7%94%9F-npe">对指针类型要做空指针判断，避免直接使用产生 NPE</a></li>
+</ul>
+</li>
+<li><a href="#code-review-%E8%A7%84%E8%8C%83">Code Review 规范</a>
+<ul>
+<li><a href="#%E7%9B%AE%E7%9A%84">目的</a></li>
+<li><a href="#%E6%A3%80%E6%9F%A5%E5%86%85%E5%AE%B9">检查内容</a>
+<ul>
+<li><a href="#%E4%BB%A3%E7%A0%81%E9%A3%8E%E6%A0%BC%E6%A3%80%E6%9F%A5">代码风格检查</a></li>
+</ul>
+</li>
+<li><a href="#%E6%B5%8B%E8%AF%95%E4%BB%A3%E7%A0%81">测试代码</a></li>
+<li><a href="#%E5%81%A5%E5%A3%AE%E6%80%A7%E6%A3%80%E6%9F%A5">健壮性检查</a></li>
+<li><a href="#%E6%96%87%E6%A1%A3%E6%A3%80%E6%9F%A5">文档检查</a></li>
+<li><a href="#%E6%B3%A8%E9%87%8A%E6%A3%80%E6%9F%A5">注释检查</a></li>
+<li><a href="#commits">Commits</a></li>
+<li><a href="#%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A1%B9">注意事项</a></li>
+<li><a href="#%E9%80%9A%E7%94%A8golang-%E5%AE%89%E5%85%A8%E8%A7%84%E8%8C%83">通用Golang 安全规范</a></li>
+<li><a href="#%E5%85%B6%E4%BB%96">其他</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+              </div>
+            </div>
+          </article>
+        </div>
+
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://blog.kilingzhang.com/post/ke-guan-ce-xing-shi-jian-yu-tan-suo/">
+              <h3 class="post-title">
+                微博增值团队可观测性探索与实践-初探
+              </h3>
+            </a>
+          </div>
+        
+
+        
+          
+            <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+<script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+
+<div id="gitalk-container"></div>
+
+<script>
+
+  var gitalk = new Gitalk({
+    clientID: '80dc14b8b39a9a9b7148',
+    clientSecret: 'e50fadaa8a0908b977c1763e1ceb3b0b77727207',
+    repo: 'Gittalk',
+    owner: 'kilingzhang',
+    admin: ['kilingzhang'],
+    id: (location.pathname).substring(0, 49),      // Ensure uniqueness and length less than 50
+    distractionFreeMode: false  // Facebook-like distraction free mode
+  })
+
+  gitalk.render('gitalk-container')
+
+</script>
+
+          
+
+          
+        
+
+        <div class="site-footer">
+  <a href="https://github.com/kilingzhang" target="_blank">kilingzhang</a>
+  <a class="rss" href="https://blog.kilingzhang.com/atom.xml" target="_blank">
+    <i class="ri-rss-line"></i> RSS
+  </a>
+</div>
+
+      </div>
+    </div>
+
+    <script>
+      hljs.initHighlightingOnLoad()
+
+      let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+      // This should probably be throttled.
+      // Especially because it triggers during smooth scrolling.
+      // https://lodash.com/docs/4.17.10#throttle
+      // You could do like...
+      // window.addEventListener("scroll", () => {
+      //    _.throttle(doThatStuff, 100);
+      // });
+      // Only not doing it here to keep this Pen dependency-free.
+
+      window.addEventListener("scroll", event => {
+        let fromTop = window.scrollY;
+
+        mainNavLinks.forEach((link, index) => {
+          let section = document.getElementById(decodeURI(link.hash).substring(1));
+          let nextSection = null
+          if (mainNavLinks[index + 1]) {
+            nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+          }
+          if (section.offsetTop <= fromTop) {
+            if (nextSection) {
+              if (nextSection.offsetTop > fromTop) {
+                link.classList.add("current");
+              } else {
+                link.classList.remove("current");    
+              }
+            } else {
+              link.classList.add("current");
+            }
+          } else {
+            link.classList.remove("current");
+          }
+        });
+      });
+
+    </script>
+  </body>
+</html>

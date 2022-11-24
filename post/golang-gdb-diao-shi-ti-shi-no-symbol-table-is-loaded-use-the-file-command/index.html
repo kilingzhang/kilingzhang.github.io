@@ -1,0 +1,264 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Mac Golang GDB 错误汇总 | kilingzhang</title>
+<link rel="shortcut icon" href="https://blog.kilingzhang.com/favicon.ico?v=1669303767893">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="https://blog.kilingzhang.com/styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="Mac Golang GDB 错误汇总 | kilingzhang - Atom Feed" href="https://blog.kilingzhang.com/atom.xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-193175920-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-193175920-1');
+</script>
+
+
+    <meta name="description" content="问题：
+
+本地 MacOS 上通过 GDB 调试 golang 程序，结果提示 No symbol table is loaded. Use the &quot;file&quot; command
+
+
+解决：
+go build -gcfl..." />
+    <meta name="keywords" content="Go" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://blog.kilingzhang.com">
+  <img class="avatar" src="https://blog.kilingzhang.com/images/avatar.png?v=1669303767893" alt="">
+  </a>
+  <h1 class="site-title">
+    kilingzhang
+  </h1>
+  <p class="site-description">
+    一只在奋斗的小透明🎈
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="/archives" class="menu">
+          归档
+        </a>
+      
+    
+      
+        <a href="/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="/post/about" class="menu">
+          关于
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+        <a href="https://github.com/kilingzhang" target="_blank">
+          <i class="ri-github-line"></i>
+        </a>
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              Mac Golang GDB 错误汇总
+            </h2>
+            <div class="post-info">
+              <span>
+                2021-03-31
+              </span>
+              <span>
+                2 min read
+              </span>
+              
+                <a href="https://blog.kilingzhang.com/tag/DYgP1hdCc/" class="post-tag">
+                  # Go
+                </a>
+              
+            </div>
+            
+            <div class="post-content-wrapper">
+              <div class="post-content">
+                <p>问题：</p>
+<blockquote>
+<p>本地 MacOS 上通过 GDB 调试 golang 程序，结果提示 No symbol table is loaded. Use the &quot;file&quot; command</p>
+</blockquote>
+<!-- more -->
+<p>解决：</p>
+<pre><code>go build -gcflags &quot;-N -l&quot; -ldflags=-compressdwarf=false main.go
+</code></pre>
+<p>问题：</p>
+<blockquote>
+<p>(gdb) run<br>
+Starting program: /usr/local/bin/fabnacci<br>
+Unable to find Mach task port for process-id 23330: (os/kern) failure (0x5).<br>
+(please check gdb is codesigned - see taskgated(8))</p>
+</blockquote>
+<p>解决：</p>
+<blockquote>
+<p>创建证书:<br>
+打开 Keychain Access 应用程序（/Applications/Utilities/Keychain Access.app）<br>
+执行菜单 钥匙串访问 -&gt; 证书助理 -&gt; 创建证书<br>
+创建一个位置位于系统的代码签名自签名根证书，并添加信任。<br>
+Mojave (10.14) 之前的系统，直接执行：</p>
+</blockquote>
+<pre><code>codesign -fs gdb-cert $(which gdb)
+</code></pre>
+<blockquote>
+<p>如果是 Mojave (10.14) 之后的系统，先创建一个文件 gdb-entitlement.xml，内容为:</p>
+</blockquote>
+<pre><code>&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;!DOCTYPE plist PUBLIC &quot;-//Apple//DTD PLIST 1.0//EN&quot; &quot;http://www.apple.com/DTDs/PropertyList-1.0.dtd&quot;&gt;
+&lt;plist version=&quot;1.0&quot;&gt;
+&lt;dict&gt;
+    &lt;key&gt;com.apple.security.cs.debugger&lt;/key&gt;
+    &lt;true/&gt;
+&lt;/dict&gt;
+&lt;/plist&gt;
+</code></pre>
+<blockquote>
+<p>再执行:</p>
+</blockquote>
+<pre><code>codesign --entitlements gdb-entitlement.xml -fs gdb-cert $(which gdb)
+</code></pre>
+<h2 id="参考阅读">参考阅读</h2>
+<p><a href="https://ethancai.github.io/2019/01/24/debug-go-program/">Debugging Go Program</a></p>
+
+              </div>
+              <div class="toc-container">
+                <ul class="markdownIt-TOC">
+<li>
+<ul>
+<li><a href="#%E5%8F%82%E8%80%83%E9%98%85%E8%AF%BB">参考阅读</a></li>
+</ul>
+</li>
+</ul>
+
+              </div>
+            </div>
+          </article>
+        </div>
+
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://blog.kilingzhang.com/post/linux-wai-wang-bu-ke-fang-wen-wen-ti-pai-cha/">
+              <h3 class="post-title">
+                记一次服务器无法访问外网的问题排查过程
+              </h3>
+            </a>
+          </div>
+        
+
+        
+          
+            <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+<script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+
+<div id="gitalk-container"></div>
+
+<script>
+
+  var gitalk = new Gitalk({
+    clientID: '80dc14b8b39a9a9b7148',
+    clientSecret: 'e50fadaa8a0908b977c1763e1ceb3b0b77727207',
+    repo: 'Gittalk',
+    owner: 'kilingzhang',
+    admin: ['kilingzhang'],
+    id: (location.pathname).substring(0, 49),      // Ensure uniqueness and length less than 50
+    distractionFreeMode: false  // Facebook-like distraction free mode
+  })
+
+  gitalk.render('gitalk-container')
+
+</script>
+
+          
+
+          
+        
+
+        <div class="site-footer">
+  <a href="https://github.com/kilingzhang" target="_blank">kilingzhang</a>
+  <a class="rss" href="https://blog.kilingzhang.com/atom.xml" target="_blank">
+    <i class="ri-rss-line"></i> RSS
+  </a>
+</div>
+
+      </div>
+    </div>
+
+    <script>
+      hljs.initHighlightingOnLoad()
+
+      let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+      // This should probably be throttled.
+      // Especially because it triggers during smooth scrolling.
+      // https://lodash.com/docs/4.17.10#throttle
+      // You could do like...
+      // window.addEventListener("scroll", () => {
+      //    _.throttle(doThatStuff, 100);
+      // });
+      // Only not doing it here to keep this Pen dependency-free.
+
+      window.addEventListener("scroll", event => {
+        let fromTop = window.scrollY;
+
+        mainNavLinks.forEach((link, index) => {
+          let section = document.getElementById(decodeURI(link.hash).substring(1));
+          let nextSection = null
+          if (mainNavLinks[index + 1]) {
+            nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+          }
+          if (section.offsetTop <= fromTop) {
+            if (nextSection) {
+              if (nextSection.offsetTop > fromTop) {
+                link.classList.add("current");
+              } else {
+                link.classList.remove("current");    
+              }
+            } else {
+              link.classList.add("current");
+            }
+          } else {
+            link.classList.remove("current");
+          }
+        });
+      });
+
+    </script>
+  </body>
+</html>

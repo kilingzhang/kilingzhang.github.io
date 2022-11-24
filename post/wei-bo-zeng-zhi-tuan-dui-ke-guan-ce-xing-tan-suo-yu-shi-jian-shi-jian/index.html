@@ -1,0 +1,264 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>微博增值团队可观测性探索与实践-实践 | kilingzhang</title>
+<link rel="shortcut icon" href="https://blog.kilingzhang.com/favicon.ico?v=1669303767893">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="https://blog.kilingzhang.com/styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="微博增值团队可观测性探索与实践-实践 | kilingzhang - Atom Feed" href="https://blog.kilingzhang.com/atom.xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-193175920-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-193175920-1');
+</script>
+
+
+    <meta name="description" content="前言
+发展
+愿景
+
+让开发人员更关注开发本身
+
+实践
+Q&amp;A
+如何快速进行故障定位？如何准确进行容量评估？如何动态展示服务的链路？如何进行系统性能优化？如何做到只能告警？在保证召回率的同时提高准确率？这都是所需要面临的挑战。业界都是..." />
+    <meta name="keywords" content="" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://blog.kilingzhang.com">
+  <img class="avatar" src="https://blog.kilingzhang.com/images/avatar.png?v=1669303767893" alt="">
+  </a>
+  <h1 class="site-title">
+    kilingzhang
+  </h1>
+  <p class="site-description">
+    一只在奋斗的小透明🎈
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="/archives" class="menu">
+          归档
+        </a>
+      
+    
+      
+        <a href="/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="/post/about" class="menu">
+          关于
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+        <a href="https://github.com/kilingzhang" target="_blank">
+          <i class="ri-github-line"></i>
+        </a>
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              微博增值团队可观测性探索与实践-实践
+            </h2>
+            <div class="post-info">
+              <span>
+                2022-05-03
+              </span>
+              <span>
+                5 min read
+              </span>
+              
+            </div>
+            
+              <img class="post-feature-image" src="https://pc.us.sinaimg.cn/003iSh2Pjx07Rv3DJmf50b07010009SN0k01.png" alt="">
+            
+            <div class="post-content-wrapper">
+              <div class="post-content">
+                <h2 id="前言">前言</h2>
+<h2 id="发展">发展</h2>
+<h2 id="愿景">愿景</h2>
+<blockquote>
+<p>让开发人员更关注开发本身</p>
+</blockquote>
+<h2 id="实践">实践</h2>
+<h2 id="qa">Q&amp;A</h2>
+<p>如何快速进行故障定位？如何准确进行容量评估？如何动态展示服务的链路？如何进行系统性能优化？如何做到只能告警？在保证召回率的同时提高准确率？这都是所需要面临的挑战。业界都是通过链路跟踪系统以及指标下钻来解决以上问题，然而微博在链路跟踪方面比较欠缺。为了填补此空白，Tiros诞生了。Tiros 是第一次发射成功的气象卫星。 Tiros 也是微博会员团队的对可观测性服务治理迈出的重要一步。 Tiros 基于OpenTelemetry协议,  提供了统一的数据上报、清洗、分析、可视化，告警等完整的服务治理的解决方案。 以最低的成本，解决通用问题。减少各团队之间重复造轮子。</p>
+<p>面对可预期的海量数据Tiros是怎样处理的？Tiros的链路跟踪是怎样实现的？又是怎样做到低侵入、低开销、低成本的？接下来将会一一介绍。</p>
+<p>下图为Tiros的整体架构图。</p>
+<figure data-type="image" tabindex="1"><img src="https://tva4.sinaimg.cn/large/0064lX42ly1h8gmmi2ejdj31be0n8wmk.jpg" alt="Tiros架构图" loading="lazy"></figure>
+<p>最上层是我们需要观测的各种服务。这里的服务不仅限于业务，还应该包括运行环境、存储、中间件等基础设施。换句话说与服务相关的任何资源都应该被观测。观测数据应越全越好。这些观测数据应通过统一的测量仪进行上报，OpenTelemetry官方提供了一些常用的sdk。微博会员团队主要使用的技术栈是PHP、Go、Java。Go和Java全部使用的官方客户端。PHP则是自研了无侵入低损耗的扩展。PHP扩展不仅支持了官方的grpc数据上报、还支持了更低损耗的udp上报。P99性能损耗增加不超过10%。<br>
+日志统一了数据上报格式、考虑到历史项目接入的成本与改造成本，日志数据上报的方案依然沿袭历史的ELK方案。对于一些不符合统一日志格式的数据则添加了中间层做数据清洗。接入的业务方只需要补齐字段就好。更低成本的接入。</p>
+<figure data-type="image" tabindex="2"><img src="https://tvax1.sinaimg.cn/large/0064lX42ly1h8gmo95uc9j30ie0c2q6i.jpg" alt="OpenTelemetry-架构图" loading="lazy"></figure>
+<p>如上图可以看到，数据上报有两种部署方案。两种的区别就是在数据上报到后端服务前，是否经过OpenTelemetry Collector Service。这时候可能会有疑惑。OpenTelemetry Collector Agent 和 OpenTelemetry Collector Service 分别是什么，有什么区别？</p>
+<p>其实无论是 OpenTelemetry Collector Agent 还是 OpenTelemetry Collector Service，他们都是官方的OpenTelemetry Collector。只是不同的部署方式的差别叫法。当我们把OpenTelemetry Collector与服务部署在相同主机时，此时便叫做 OpenTelemetry Collector Agent，如果是独立的集群部署，与服务主机无关，则为 OpenTelemetry Collector Service。除了部署方式的区别之外。个人理解他们侧重点也会有一些区别。对于Agent，更应该关注的是数据的简单关联与聚合。同时因为是本机部署。减少了应用与Agent数据上报的网络开销。同时还可以注入或修改Attributes。更灵活。当然缺点也是有的，就是单机处理的性能有限，也会增加本机的各种负担。所以也只能处理一些简单的数据处理。不可以过重。<br>
+相对的，OpenTelemetry Collector Service 则可以解决  OpenTelemetry Collector Agent 的不足。可以集群化部署，提高数据处理的吞吐能力。可以处理更重的逻辑。</p>
+<p>推荐 OpenTelemetry Collector Agent + OpenTelemetry Collector Service 的模式。两者可以取长补短。虽然会有一些额外的开销，但我认为这是值得的。</p>
+<p>OpenTelemetry Collector Service  处理后 ，则将数据上报到各自的后端服务。比较常见的后端服务有Jaeger、Skywalking、Elasticsearch、Prometheus等等。也可以将这些原始数据导入流计算中，对海量数据做数据分析后存储。这些都可以是后端服务。</p>
+<figure data-type="image" tabindex="3"><img src="https://tva1.sinaimg.cn/large/0064lX42ly1gxoair7nvxj30tj09qt9g.jpg" alt="Tiros数据流向图.png" loading="lazy"></figure>
+<p>上图为Tiros数据流向图。</p>
+<h2 id="问题案例">问题案例</h2>
+<ol>
+<li>慢服务发现并定位问题</li>
+</ol>
+<figure data-type="image" tabindex="4"><img src="http://sinastorage.cn/weibo-vip/%E4%B8%80%E6%AC%A1%E7%AE%80%E5%8D%95%E7%9A%84%E6%85%A2%E6%9C%8D%E5%8A%A1%E5%88%86%E6%9E%90.jpg" alt="一次简单的慢服务分析" loading="lazy"></figure>
+<ol start="2">
+<li>
+<p>资源依赖故障发现</p>
+</li>
+<li>
+<p>服务质量周报日报</p>
+</li>
+</ol>
+<h2 id="tiros-未来规划">Tiros-未来规划</h2>
+<ol>
+<li>PHP 5.x 支持</li>
+<li>Golang框架接入优化</li>
+<li>根因分析</li>
+<li>更多维度的分析指标</li>
+<li>更准确更详细的服务报告</li>
+<li>前端（H5、小程序、移动端）服务支持</li>
+<li>Tiros交互优化</li>
+<li>提高告警召回率与准确率</li>
+<li>接入文档、部署文档</li>
+</ol>
+
+              </div>
+              <div class="toc-container">
+                <ul class="markdownIt-TOC">
+<li>
+<ul>
+<li><a href="#%E5%89%8D%E8%A8%80">前言</a></li>
+<li><a href="#%E5%8F%91%E5%B1%95">发展</a></li>
+<li><a href="#%E6%84%BF%E6%99%AF">愿景</a></li>
+<li><a href="#%E5%AE%9E%E8%B7%B5">实践</a></li>
+<li><a href="#qa">Q&amp;A</a></li>
+<li><a href="#%E9%97%AE%E9%A2%98%E6%A1%88%E4%BE%8B">问题案例</a></li>
+<li><a href="#tiros-%E6%9C%AA%E6%9D%A5%E8%A7%84%E5%88%92">Tiros-未来规划</a></li>
+</ul>
+</li>
+</ul>
+
+              </div>
+            </div>
+          </article>
+        </div>
+
+        
+
+        
+          
+            <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+<script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+
+<div id="gitalk-container"></div>
+
+<script>
+
+  var gitalk = new Gitalk({
+    clientID: '80dc14b8b39a9a9b7148',
+    clientSecret: 'e50fadaa8a0908b977c1763e1ceb3b0b77727207',
+    repo: 'Gittalk',
+    owner: 'kilingzhang',
+    admin: ['kilingzhang'],
+    id: (location.pathname).substring(0, 49),      // Ensure uniqueness and length less than 50
+    distractionFreeMode: false  // Facebook-like distraction free mode
+  })
+
+  gitalk.render('gitalk-container')
+
+</script>
+
+          
+
+          
+        
+
+        <div class="site-footer">
+  <a href="https://github.com/kilingzhang" target="_blank">kilingzhang</a>
+  <a class="rss" href="https://blog.kilingzhang.com/atom.xml" target="_blank">
+    <i class="ri-rss-line"></i> RSS
+  </a>
+</div>
+
+      </div>
+    </div>
+
+    <script>
+      hljs.initHighlightingOnLoad()
+
+      let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+      // This should probably be throttled.
+      // Especially because it triggers during smooth scrolling.
+      // https://lodash.com/docs/4.17.10#throttle
+      // You could do like...
+      // window.addEventListener("scroll", () => {
+      //    _.throttle(doThatStuff, 100);
+      // });
+      // Only not doing it here to keep this Pen dependency-free.
+
+      window.addEventListener("scroll", event => {
+        let fromTop = window.scrollY;
+
+        mainNavLinks.forEach((link, index) => {
+          let section = document.getElementById(decodeURI(link.hash).substring(1));
+          let nextSection = null
+          if (mainNavLinks[index + 1]) {
+            nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+          }
+          if (section.offsetTop <= fromTop) {
+            if (nextSection) {
+              if (nextSection.offsetTop > fromTop) {
+                link.classList.add("current");
+              } else {
+                link.classList.remove("current");    
+              }
+            } else {
+              link.classList.add("current");
+            }
+          } else {
+            link.classList.remove("current");
+          }
+        });
+      });
+
+    </script>
+  </body>
+</html>

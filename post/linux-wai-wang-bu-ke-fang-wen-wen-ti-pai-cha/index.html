@@ -1,0 +1,268 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>记一次服务器无法访问外网的问题排查过程 | kilingzhang</title>
+<link rel="shortcut icon" href="https://blog.kilingzhang.com/favicon.ico?v=1669303767893">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="https://blog.kilingzhang.com/styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="记一次服务器无法访问外网的问题排查过程 | kilingzhang - Atom Feed" href="https://blog.kilingzhang.com/atom.xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-193175920-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-193175920-1');
+</script>
+
+
+    <meta name="description" content="今天线上突然有一台机器的所有外网依赖接口开始报警。根据日志排查了下初步定为是该机器无法访问外网了。把机器脱离七层后开始排查问题。搞起～
+
+第一反应就是先访问下外网地址。
+curl baidu.com
+
+确定了是一个必现的问题。之后先随意 p..." />
+    <meta name="keywords" content="" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://blog.kilingzhang.com">
+  <img class="avatar" src="https://blog.kilingzhang.com/images/avatar.png?v=1669303767893" alt="">
+  </a>
+  <h1 class="site-title">
+    kilingzhang
+  </h1>
+  <p class="site-description">
+    一只在奋斗的小透明🎈
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="/archives" class="menu">
+          归档
+        </a>
+      
+    
+      
+        <a href="/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="/post/about" class="menu">
+          关于
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+        <a href="https://github.com/kilingzhang" target="_blank">
+          <i class="ri-github-line"></i>
+        </a>
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              记一次服务器无法访问外网的问题排查过程
+            </h2>
+            <div class="post-info">
+              <span>
+                2021-03-30
+              </span>
+              <span>
+                3 min read
+              </span>
+              
+            </div>
+            
+              <img class="post-feature-image" src="https://blog.kilingzhang.com/post-images/linux-wai-wang-bu-ke-fang-wen-wen-ti-pai-cha.svg" alt="">
+            
+            <div class="post-content-wrapper">
+              <div class="post-content">
+                <p>今天线上突然有一台机器的所有外网依赖接口开始报警。根据日志排查了下初步定为是该机器无法访问外网了。把机器脱离七层后开始排查问题。搞起～</p>
+<!-- more -->
+<p>第一反应就是先访问下外网地址。</p>
+<pre><code>curl baidu.com
+</code></pre>
+<p>确定了是一个必现的问题。之后先随意 ping 了一下域名。</p>
+<pre><code>ping baidu.com
+</code></pre>
+<p>发现无论 ping 任何域名都会返回如下的信息：</p>
+<pre><code>Destination Host Unreachable
+</code></pre>
+<p>那么接下来开始排查网络是哪一步出了问题。</p>
+<p><code>ping 127.0.0.1</code></p>
+<p>如果 ping 的通说明tcp协议栈没有问题。</p>
+<p><code>ping 主机地址</code></p>
+<p>如果 ping的通说明网卡没有问题。</p>
+<blockquote>
+<p>「 ifconfig -a 」查看主机地址</p>
+</blockquote>
+<p><code>ping 路由默认网关</code></p>
+<p>ping的通说明包可以到达路由器。</p>
+<blockquote>
+<p>「 route -n」查看默认路由</p>
+</blockquote>
+<p><code>ping DNS服务器地址</code></p>
+<p>ping的通说明DNS服务期解析没有问题。</p>
+<blockquote>
+<p>「 cat /etc/resolv.conf 」查看DNS服务器</p>
+</blockquote>
+<p>最后发现路由默认的网关地址无法 ping 通。<br>
+这时候突然想到昨天运维同学帮忙解决其他问题的时候重启过这台机器。这台机器的默认网卡和默认路由不是相同的网卡。猜测之前负责的同学是临时设置的，重启后路由默认网关应该是被重置为最原始配置了。</p>
+<p>找到问题就简单了。把路由的默认网关改为正确的网关ip就好。</p>
+<pre><code>删除之前的默认网关 （此步骤非必须，不同的网卡可以设置多个默认网关。）
+route delete default gw x.x.x.x eth0
+
+添加正确的的默认网关
+route add default gw x.x.x.x eth0
+</code></pre>
+<p>验证</p>
+<pre><code>curl baidu.com
+
+&lt;html&gt;
+&lt;meta http-equiv=&quot;refresh&quot; content=&quot;0;url=http://www.baidu.com/&quot;&gt;
+&lt;/html&gt;
+</code></pre>
+<p>完美解决！问题到不是很难，但是排查和学习的过程很有趣。记录下、方便日后查询。</p>
+<h2 id="参考资料">参考资料</h2>
+<p><a href="https://www.jianshu.com/p/cd3cbfee4e51">linux Destination Host Unreachable</a><br>
+<a href="https://os.51cto.com/art/201905/595857.htm">4种在Linux中检查默认网关或路由器IP地址的方法</a><br>
+<a href="https://zh.wikihow.com/%E5%9C%A8Linux%E4%B8%8A%E6%B7%BB%E5%8A%A0%E6%88%96%E6%9B%B4%E6%94%B9%E9%BB%98%E8%AE%A4%E7%BD%91%E5%85%B3">如何在Linux上添加或更改默认网关</a><br>
+<a href="https://blog.csdn.net/shangdi1988/article/details/65713582">Linux 如何查看修改DNS配置</a></p>
+
+              </div>
+              <div class="toc-container">
+                <ul class="markdownIt-TOC">
+<li>
+<ul>
+<li><a href="#%E5%8F%82%E8%80%83%E8%B5%84%E6%96%99">参考资料</a></li>
+</ul>
+</li>
+</ul>
+
+              </div>
+            </div>
+          </article>
+        </div>
+
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://blog.kilingzhang.com/post/go-channel-close-hou-zai-du-qu-hui-fa-sheng-shi-me/">
+              <h3 class="post-title">
+                go channel close 后再读取会发生什么？
+              </h3>
+            </a>
+          </div>
+        
+
+        
+          
+            <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+<script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+
+<div id="gitalk-container"></div>
+
+<script>
+
+  var gitalk = new Gitalk({
+    clientID: '80dc14b8b39a9a9b7148',
+    clientSecret: 'e50fadaa8a0908b977c1763e1ceb3b0b77727207',
+    repo: 'Gittalk',
+    owner: 'kilingzhang',
+    admin: ['kilingzhang'],
+    id: (location.pathname).substring(0, 49),      // Ensure uniqueness and length less than 50
+    distractionFreeMode: false  // Facebook-like distraction free mode
+  })
+
+  gitalk.render('gitalk-container')
+
+</script>
+
+          
+
+          
+        
+
+        <div class="site-footer">
+  <a href="https://github.com/kilingzhang" target="_blank">kilingzhang</a>
+  <a class="rss" href="https://blog.kilingzhang.com/atom.xml" target="_blank">
+    <i class="ri-rss-line"></i> RSS
+  </a>
+</div>
+
+      </div>
+    </div>
+
+    <script>
+      hljs.initHighlightingOnLoad()
+
+      let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+      // This should probably be throttled.
+      // Especially because it triggers during smooth scrolling.
+      // https://lodash.com/docs/4.17.10#throttle
+      // You could do like...
+      // window.addEventListener("scroll", () => {
+      //    _.throttle(doThatStuff, 100);
+      // });
+      // Only not doing it here to keep this Pen dependency-free.
+
+      window.addEventListener("scroll", event => {
+        let fromTop = window.scrollY;
+
+        mainNavLinks.forEach((link, index) => {
+          let section = document.getElementById(decodeURI(link.hash).substring(1));
+          let nextSection = null
+          if (mainNavLinks[index + 1]) {
+            nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+          }
+          if (section.offsetTop <= fromTop) {
+            if (nextSection) {
+              if (nextSection.offsetTop > fromTop) {
+                link.classList.add("current");
+              } else {
+                link.classList.remove("current");    
+              }
+            } else {
+              link.classList.add("current");
+            }
+          } else {
+            link.classList.remove("current");
+          }
+        });
+      });
+
+    </script>
+  </body>
+</html>

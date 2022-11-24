@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+    <id>https://blog.kilingzhang.com</id>
+    <title>kilingzhang</title>
+    <updated>2022-11-24T15:30:01.928Z</updated>
+    <generator>https://github.com/jpmonette/feed</generator>
+    <link rel="alternate" href="https://blog.kilingzhang.com"/>
+    <link rel="self" href="https://blog.kilingzhang.com/atom.xml"/>
+    <subtitle>一只在奋斗的小透明🎈</subtitle>
+    <logo>https://blog.kilingzhang.com/images/avatar.png</logo>
+    <icon>https://blog.kilingzhang.com/favicon.ico</icon>
+    <rights>All rights reserved 2022, kilingzhang</rights>
+    <entry>
+        <title type="html"><![CDATA[基于OpenTelemetry生态与ClickHouse实现的低成本一站式可观测平台设计方案]]></title>
+        <id>https://blog.kilingzhang.com/post/ji-yu-opentelemetry-sheng-tai-yu-clickhouse-shi-xian-de-di-cheng-ben-yi-zhan-shi-ke-guan-ce-ping-tai/</id>
+        <link href="https://blog.kilingzhang.com/post/ji-yu-opentelemetry-sheng-tai-yu-clickhouse-shi-xian-de-di-cheng-ben-yi-zhan-shi-ke-guan-ce-ping-tai/">
+        </link>
+        <updated>2022-11-22T18:35:15.000Z</updated>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[基于Influxdb实现的低成本告警平台设计方案]]></title>
+        <id>https://blog.kilingzhang.com/post/ji-yu-influxdb-de-tong-yi-gao-jing-ping-tai-she-ji/</id>
+        <link href="https://blog.kilingzhang.com/post/ji-yu-influxdb-de-tong-yi-gao-jing-ping-tai-she-ji/">
+        </link>
+        <updated>2022-11-22T18:30:09.000Z</updated>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[Go团队开发规范 初定版]]></title>
+        <id>https://blog.kilingzhang.com/post/golang-tuan-dui-kai-fa-gui-fan-chu-ding-ban/</id>
+        <link href="https://blog.kilingzhang.com/post/golang-tuan-dui-kai-fa-gui-fan-chu-ding-ban/">
+        </link>
+        <updated>2022-03-07T15:08:55.000Z</updated>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[微博增值团队可观测性探索与实践-初探]]></title>
+        <id>https://blog.kilingzhang.com/post/ke-guan-ce-xing-shi-jian-yu-tan-suo/</id>
+        <link href="https://blog.kilingzhang.com/post/ke-guan-ce-xing-shi-jian-yu-tan-suo/">
+        </link>
+        <updated>2021-12-18T10:26:58.000Z</updated>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[OpenTelemetry-数据源]]></title>
+        <id>https://blog.kilingzhang.com/post/opentelemetry-shu-ju-yuan/</id>
+        <link href="https://blog.kilingzhang.com/post/opentelemetry-shu-ju-yuan/">
+        </link>
+        <updated>2021-11-24T13:52:55.000Z</updated>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[OpenTelemetry-组件]]></title>
+        <id>https://blog.kilingzhang.com/post/opentelemetry-zu-jian/</id>
+        <link href="https://blog.kilingzhang.com/post/opentelemetry-zu-jian/">
+        </link>
+        <updated>2021-11-18T02:02:37.000Z</updated>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[OpenTelemetry-什么是OpenTelemetry]]></title>
+        <id>https://blog.kilingzhang.com/post/tong-yi-ke-guan-ce-ping-tai-opentelemetry/</id>
+        <link href="https://blog.kilingzhang.com/post/tong-yi-ke-guan-ce-ping-tai-opentelemetry/">
+        </link>
+        <updated>2021-11-17T15:19:10.000Z</updated>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[Memcached设置缓存失效问题-过期时间过长]]></title>
+        <id>https://blog.kilingzhang.com/post/memcached-she-zhi-huan-cun-shi-xiao-wen-ti-guo-qi-shi-jian-guo-chang/</id>
+        <link href="https://blog.kilingzhang.com/post/memcached-she-zhi-huan-cun-shi-xiao-wen-ti-guo-qi-shi-jian-guo-chang/">
+        </link>
+        <updated>2021-11-12T14:06:27.000Z</updated>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[Mac Golang GDB 错误汇总]]></title>
+        <id>https://blog.kilingzhang.com/post/golang-gdb-diao-shi-ti-shi-no-symbol-table-is-loaded-use-the-file-command/</id>
+        <link href="https://blog.kilingzhang.com/post/golang-gdb-diao-shi-ti-shi-no-symbol-table-is-loaded-use-the-file-command/">
+        </link>
+        <updated>2021-03-31T13:50:53.000Z</updated>
+        <summary type="html"><![CDATA[<p>问题：</p>
+<blockquote>
+<p>本地 MacOS 上通过 GDB 调试 golang 程序，结果提示 No symbol table is loaded. Use the &quot;file&quot; command</p>
+</blockquote>
+]]></summary>
+        <content type="html"><![CDATA[<p>问题：</p>
+<blockquote>
+<p>本地 MacOS 上通过 GDB 调试 golang 程序，结果提示 No symbol table is loaded. Use the &quot;file&quot; command</p>
+</blockquote>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[记一次服务器无法访问外网的问题排查过程]]></title>
+        <id>https://blog.kilingzhang.com/post/linux-wai-wang-bu-ke-fang-wen-wen-ti-pai-cha/</id>
+        <link href="https://blog.kilingzhang.com/post/linux-wai-wang-bu-ke-fang-wen-wen-ti-pai-cha/">
+        </link>
+        <updated>2021-03-30T09:41:19.000Z</updated>
+        <summary type="html"><![CDATA[<p>今天线上突然有一台机器的所有外网依赖接口开始报警。根据日志排查了下初步定为是该机器无法访问外网了。把机器脱离七层后开始排查问题。搞起～</p>
+]]></summary>
+        <content type="html"><![CDATA[<p>今天线上突然有一台机器的所有外网依赖接口开始报警。根据日志排查了下初步定为是该机器无法访问外网了。把机器脱离七层后开始排查问题。搞起～</p>
+]]></content>
+    </entry>
+</feed>
